@@ -1,5 +1,6 @@
 import { Eye, EyeClosed } from "lucide-react"
 import { useState, type FormEvent } from "react"
+import { Link } from "react-router-dom"
 
 const FrontPage = () => {
   const [hidden, setHidden] = useState(true)
@@ -23,8 +24,12 @@ const FrontPage = () => {
                 : <EyeClosed className="absolute top-2 right-2"/>
               }
             </button>
-            <input type={hidden ? "password" : "text"} name="password" id="password" className="bg-white rounded ps-4 pe-10 py-2" placeholder="Password" autoComplete="off"/>
+            <input type={hidden ? "password" : "text"} name="password" id="password" className="bg-white rounded ps-4 pe-10 py-2 w-full" placeholder="Password" autoComplete="off"/>
           </div>
+        </div>
+        <div className="flex gap-2">
+          <p className="text-gray-500">Don't have an account yet? </p>
+          <Link to={'/signUp'}>Sign-up now!</Link>
         </div>
         {loading 
           ? <div className="bg-[#DDB892] text-white font-bold p-3 rounded -translate-y-0.5 duration-200 hover:cursor-pointer hover:translate-none flex justify-center items-center">Loading</div>
