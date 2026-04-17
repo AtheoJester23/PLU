@@ -7,15 +7,29 @@ body{
 :root{
     --main-bg: #E6CCB2;
     --sub-bg: #EDE0D4;
+    --nav: #7F5539;
     --color-btn: #B08968;
+    --color-navBtn: #9C6644;
     --color-btn-active: #DDB892;
-    --theme-textBtn: rgb(255,255,255);
+    --textColorr: white;
+}
+
+.dark{
+    --main-bg: #5A3F33;
+    --nav: #251A1A;
+    --color-navBtn: #382323; 
 }
 
 @theme {
   --color-main: var(--main-bg);
   --color-sub: var(--sub-bg);
+  --color-nav: var(--nav);
+  --color-navBtn: var(--color-navBtn);
+  --color-btn: var(--color-btn);
+  --color-btn-active: var(--color-btn-active);
+  --textColorr: var(--textColorr);
 }
+
 
 .simpleForms{
     display: flex;

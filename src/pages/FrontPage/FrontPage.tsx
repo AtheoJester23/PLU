@@ -20,7 +20,7 @@ const FrontPage = () => {
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setLoading(true)
+    
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
@@ -44,6 +44,7 @@ const FrontPage = () => {
     }
 
     try {
+      setLoading(true)
       const {data, error} = await supabase.auth.signInWithPassword({email, password});
       
       if(error){
