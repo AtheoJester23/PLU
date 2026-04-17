@@ -89,7 +89,7 @@ const SignUp = () => {
                 throw new Error("User creation failed");
             }
 
-            const {data, error} = await supabase.from('profiles').upsert({
+            const {error} = await supabase.from('profiles').upsert({
                 id: authData.user.id,
                 first_name,
                 last_name,
