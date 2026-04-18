@@ -85,7 +85,7 @@ const FrontPage = () => {
   }, [])
 
   return (
-    <main className="bg-main h-[100vh] flex justify-center items-center">
+    <main className="bg-main h-[100dvh] border flex justify-center items-center">
       <form onSubmit={(e) => handleLogin(e)} className="flex flex-col bg-sub shadow p-5 rounded gap-3">
         <h1 className="text-4xl font-bold">Sign-in</h1>
         <div className="flex flex-col gap-2">

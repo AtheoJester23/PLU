@@ -5,6 +5,7 @@ import PageNotFound from './pages/PageNotFound'
 import SignUp from './pages/SignUp/SignUp'
 import Home from './pages/Home/Home'
 import MainLayout from './layout/MainLayout'
+import Create from './pages/Create/Create'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route element={<MainLayout/>}>
           <Route path='/home' element={<Home/>}/>
         </Route>
+        <Route path='/create' element={<Create/>}/>
         <Route path='*' element={<PageNotFound/>}/>
       </Routes>
     </BrowserRouter>

@@ -1,5 +1,5 @@
 import { Circle, LogOut, Moon, Plus, Sun } from "lucide-react"
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import supabase from "../config/supabaseClient";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../state/store";
@@ -56,7 +56,12 @@ const Navbar = () => {
     }, [theme]);
 
     return (
-        <nav className="bg-nav w-full fixed px-[20px] py-[10px] flex justify-end gap-3">
+        <motion.nav
+            initial={{y: -100}}
+            animate={{y: 0}}
+            transition={{type: "spring", stiffness: 200, damping: 30}}
+            className="z-2000 bg-nav w-full fixed top-0 px-[20px] py-[10px] flex justify-end gap-3"
+        >
             <div className="flex gap-2 justify-center items-center">
                 <button
                     onClick={handleTheme}
@@ -94,15 +99,15 @@ const Navbar = () => {
                         {theme === "light" && <Sun/>}
                     </motion.div>
                 </button>
-                <button className="flex gap-2 px-[10px] py-[10px] rounded text-white bg-navBtn shadow hover:translate-y-0.25 duration-200 cursor-pointer active:cursor-default">
+                <Link to={"/create"} className="flex gap-2 px-[10px] py-[10px] rounded text-white bg-navBtn shadow hover:translate-y-0.25 duration-200 cursor-pointer active:cursor-default">
                     <Plus aria-hidden="true"/>
-                </button>
-                <button onClick={() => handleLogout()} className="flex justify-center items-center text-[var(--textColorr)] border-2 border-navBtn px-5 py-2 rounded hover:bg-navBtn cursor-pointer hover:border-navBtn duration-200">
+                </Link>
+                <button onClick={() => handleLogout()} className="flex justify-center items-center text-[var(--textColorr)] border-2 border-navBtn px-5 py-2 rounded hover:bg-navBtn cursor-pointer hover:border-navBtn duration-200 hover:translate-y-0.25">
                     <LogOut aria-hidden="true"/>
                     <span>Logout</span>
                 </button>
             </div>
-        </nav>
+        </motion.nav>
     )
 }
 

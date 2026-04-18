@@ -1,7 +1,14 @@
 @import "tailwindcss";
 
-body{
-    font-size: 16px;
+
+html, body {
+  margin: 0;
+  font-size: 16px;
+  padding: 0;
+}
+
+#root {
+  min-height: 100%;
 }
 
 :root{
@@ -12,6 +19,10 @@ body{
     --color-navBtn: #9C6644;
     --color-btn-active: #DDB892;
     --textColorr: white;
+}
+
+html, body, #root {
+  height: 100%;
 }
 
 .dark{
