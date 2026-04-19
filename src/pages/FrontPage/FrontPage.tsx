@@ -2,6 +2,9 @@ import { Eye, EyeClosed } from "lucide-react"
 import { useEffect, useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import supabase from "../../config/supabaseClient"
+import { useDispatch } from "react-redux"
+import type { AppDispatch } from "../../state/store"
+import { setUser } from "../../state/auth/authSlice"
 
 type possibleErrs = {
   email: boolean,
@@ -16,7 +19,7 @@ const FrontPage = () => {
     password: false
   })
   const navigate = useNavigate();
-
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -53,7 +56,10 @@ const FrontPage = () => {
 
       console.log(data);
 
-      console.log('Logged in successfully...')
+      console.log('Logged in successfully...', data.user.id)
+
+      dispatch(setUser(data.user.id));
+
       navigate('/home')
     } catch (error) {
       console.error((error as Error).message);

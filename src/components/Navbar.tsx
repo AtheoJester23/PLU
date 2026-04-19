@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 
 const Navbar = () => {
+    const id = useSelector((state: RootState) => state.auth.user.id)
     const theme = useSelector((state: RootState) => state.ui.theme);
     const dispatch = useDispatch<AppDispatch>()
     const navigate = useNavigate();
@@ -63,6 +64,8 @@ const Navbar = () => {
             className="z-2000 bg-nav w-full fixed top-0 px-[20px] py-[10px] flex justify-end gap-3"
         >
             <div className="flex gap-2 justify-center items-center">
+                <button onClick={() => console.log(id)}>testing</button>
+                
                 <button
                     onClick={handleTheme}
                     className={`relative w-[70px] h-[30px] bg-[#7E6363] rounded-full px-1 cursor-pointer flex items-center`}
@@ -81,17 +84,17 @@ const Navbar = () => {
 
                     <motion.div
                         animate={{
-                            x: theme === "dark" ? 40 : 0,
+                            x: theme === "dark" ? 29 : 1,
                         }}
                         transition={{ type: "spring", stiffness: 200, damping: 30 }}
-                        className="z-200 w-[22px] h-[22px] bg-white rounded-full"
+                        className="z-200 w-[32px] h-[22px] bg-white rounded-full"
                     />
 
                     <motion.div
                         initial={{opacity: 0}}
                         animate={{
                             opacity: 1,
-                            x: theme === "dark" ? 0 : 40,
+                            x: theme === "dark" ? 0 : 38,
                         }}
                         transition={{type: "spring", stiffness: 200, damping: 30}}
                         className="absolute left-1" 

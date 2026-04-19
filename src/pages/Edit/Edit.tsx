@@ -1,8 +1,8 @@
-import { Upload, X } from "lucide-react"
+import { Target, Upload, X } from "lucide-react"
 import { nanoid } from "nanoid";
-import { useRef, useState, type SubmitEvent } from "react";
+import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import supabase from "../../config/supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 type possibleErrs = {
   name: boolean,
@@ -11,7 +11,21 @@ type possibleErrs = {
   pic: boolean
 }
 
-const Create = () => {
+type productDeets = {
+  created_at: string,
+  description: string,
+  id: string,
+  name: string,
+  picture: string,
+  price: number,
+  store_id: string,
+  updated_at?: string
+}
+
+const Edit = () => {
+    const { id } = useParams();
+    const [productDetails, setProductDetails] = useState<productDeets | null>(null)
+
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePrev, setImagePrev] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
@@ -123,20 +137,86 @@ const Create = () => {
 
   }
 
+  useEffect(() => {
+    const getProduct = async () => {
+        try {
+            const {data, error} = await supabase.from('products').select('*').eq("id", id).single();
+
+            if(error) throw error;
+
+            setProductDetails(data);
+        } catch (error) {
+            console.error((error as Error).message)
+        }
+    }
+
+    getProduct();
+  },[]) 
+
   return (
     <main className="bg-main  p-10 pt-20">
       <form className="simpleForms h-[100%] shadow-lg" onSubmit={(e) => handleUpload(e)}>
-        <h1 className="text-4xl font-bold">Create Product</h1>
+        <h1 className="text-4xl font-bold">Edit Product</h1>
         <div>
-          <input className="w-full" type="text" name="productName" placeholder="Product Name" autoComplete="off"/>
+            <input
+                className="w-full"
+                type="text"
+                value={productDetails?.name || ""}
+                onChange={(e) =>
+                    setProductDetails((prev) => {
+                        if (!prev) return prev; // or return a default object
+
+                        return {
+                        ...prev,
+                        name: e.target.value,
+                        };
+                    })
+                }
+                name="productName"
+                placeholder="Product Name"
+                autoComplete="off"
+            />
         </div>
 
         <div>
-          <input className="w-full" type="number" name="productPrice" placeholder="Product Price" autoComplete="off"/>
+          <input 
+            className="w-full" 
+            type="number" 
+            value={productDetails?.price}
+            onChange={(e) =>
+                setProductDetails((prev) => {
+                    if (!prev) return prev; // or return a default object
+
+                    return {
+                        ...prev,
+                        price: Number(e.target.value),
+                    };
+                })
+            }
+            name="productPrice" 
+            placeholder="Product Price" 
+            autoComplete="off"
+          />
         </div>
 
         <div className="red-5005">
-          <textarea className="w-full" name="description" placeholder="Description" rows={12}/>
+          <textarea 
+            className="w-full" 
+            name="description"
+            value={productDetails?.description}
+            onChange={(e) => {
+                setProductDetails((prev) => {
+                    if(!prev) return prev;
+
+                    return {
+                        ...prev,
+                        description: e.target.value
+                    }
+                })
+            }} 
+            placeholder="Description" 
+            rows={12}
+          />
         </div>
 
         {!imagePrev ? (
@@ -180,4 +260,4 @@ const Create = () => {
   )
 }
 
-export default Create
+export default Edit

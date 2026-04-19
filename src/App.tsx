@@ -6,6 +6,7 @@ import SignUp from './pages/SignUp/SignUp'
 import Home from './pages/Home/Home'
 import MainLayout from './layout/MainLayout'
 import Create from './pages/Create/Create'
+import Edit from './pages/Edit/Edit'
 
 function App() {
   return (
@@ -15,8 +16,9 @@ function App() {
         <Route path='/signUp' element={<SignUp/>}/>
         <Route element={<MainLayout/>}>
           <Route path='/home' element={<Home/>}/>
+          <Route path='/create' element={<Create/>}/>
+          <Route path='/edit/:id' element={<Edit/>}/>
         </Route>
-        <Route path='/create' element={<Create/>}/>
         <Route path='*' element={<PageNotFound/>}/>
       </Routes>
     </BrowserRouter>
