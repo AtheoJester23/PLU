@@ -1,5 +1,8 @@
 import { Upload, X } from "lucide-react"
-import { useRef, useState } from "react";
+import { nanoid } from "nanoid";
+import { useRef, useState, type SubmitEvent } from "react";
+import supabase from "../../config/supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 type possibleErrs = {
   name: boolean,
@@ -9,6 +12,7 @@ type possibleErrs = {
 }
 
 const Create = () => {
+  const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePrev, setImagePrev] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const [errors, setErrors] = useState({
@@ -17,6 +21,7 @@ const Create = () => {
     bio: false,
     pic: false
   })
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handlePickPic = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +40,7 @@ const Create = () => {
     reader.onloadend = () => {
       const result = reader.result;
       if(typeof result === 'string'){
+        setImageFile(file);
         setImagePrev(result);
         setImageName(file.name);
         setErrors((prev) => ({...prev, pic: false}))
@@ -51,20 +57,86 @@ const Create = () => {
       }
   }
 
+  const handleUpload = async (e: SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("productName") as string;
+    const price = Number(formData.get('productPrice')) as number;
+    const description = formData.get('description') as string;
+    
+    let errs = {...errors};
+    
+    if(!imageFile){
+      errs.pic = true;
+    }
+
+    if(!name || name.replace(/[ ]/g, "") == ""){
+      errs.name = true;
+    }
+    
+    if(!price || price <= 0){
+      errs.price = true;
+    }
+
+    if(!imagePrev){
+      errs.pic = true;
+    }
+
+    // if(Object.values(errs).includes(true)){
+    //   setErrors(errs);
+    //   errs = {...errors};
+    //   return;
+    // }
+
+    try {
+      const {data, error} = await supabase.storage.from('productsPic').upload(`public/${imageName}`, imageFile)
+    
+      if(error) throw error;
+
+      // console.log("Image uploaded successfully: ", data.path)
+    
+      const {data: urlData} = await supabase.storage.from('productsPic').getPublicUrl(data.path);
+
+      console.log(urlData);
+
+      const {data: storeSesh} = await supabase.auth.getSession();
+
+      console.log(storeSesh.session?.user.id);
+
+      const saveFile = {
+        store_id: storeSesh.session?.user.id,
+        name,
+        price,
+        description,
+        picture: urlData.publicUrl,
+      }
+
+      const {data: productsData, error: productsError} = await supabase.from('products').insert(saveFile);
+
+      if(productsError) throw productsError;
+
+      navigate("/home");
+    } catch (error) {
+      console.error((error as Error).message)
+    }
+
+  }
+
   return (
     <main className="bg-main h-full simpleMains">
-      <form className="simpleForms">
+      <form className="simpleForms" onSubmit={(e) => handleUpload(e)}>
         <h1 className="text-4xl font-bold">Create Product</h1>
         <div>
           <input className="w-full" type="text" name="productName" placeholder="Product Name" autoComplete="off"/>
         </div>
 
         <div>
-          <input className="w-full" type="number" name="productName" placeholder="Product Price" autoComplete="off"/>
+          <input className="w-full" type="number" name="productPrice" placeholder="Product Price" autoComplete="off"/>
         </div>
 
         <div className="red-5005">
-          <textarea className="w-full" placeholder="Description"/>
+          <textarea className="w-full" name="description" placeholder="Description"/>
         </div>
 
         {!imagePrev ? (

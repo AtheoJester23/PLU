@@ -1,9 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../../config/supabaseClient";
 import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../state/store";
+
+
 
 const Home = () => {
+    const userId = useSelector((state: RootState) => state.auth.user.id);
     const navigate = useNavigate();
+    const [products, setProducts] = useState(null);
 
     let temporaryProducts = [
         {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 1", price: 19.99, id: 1},
@@ -19,7 +26,24 @@ const Home = () => {
     ]
 
     temporaryProducts.length = 0;
-  
+
+    useEffect(() => {
+      const getProducts = async () => {
+        try {
+          const {data, error} = await supabase.from('products').select().eq('id', userId)
+
+          if(error) throw error;
+
+          console.log(data)
+        } catch (error) {
+          console.error((error as Error).message)
+        }
+      }
+
+      if(!userId) return;
+      getProducts();
+    }, [])
+
   return (
     <main className={`auto-rows-fr py-[90px] px-10 ${temporaryProducts.length < 1 && "h-[100vh]"}`}>
       <h1 className="text-3xl font-bold p-0">Products</h1>
