@@ -59,8 +59,8 @@ const Home = () => {
     }, [userId])
 
   return (
-    <main className={`auto-rows-fr py-[90px] px-10 ${products && products?.length < 6 && "h-[100vh]"} bg-main`}>
-      <h1 className="text-3xl font-bold p-0">Products</h1>
+    <main className={`auto-rows-fr max-sm:py-[65px] py-[90px] px-7 ${products && products?.length < 6 && "h-[100vh]"} bg-main`}>
+      <h1 className="text-3xl font-bold p-0 text-nav text-center">Products</h1>
       {loading ? (
         <div className="h-[100%] flex justify-center items-center font-bold">
           <ClipLoader className="text-red-500" color={`${theme == "light" ? "black" : "white"}`}/>
@@ -73,11 +73,11 @@ const Home = () => {
                 <p className="font-bold text-4xl text-nav">No products yet...</p>
             </Link>
           ):(
-            <ul className="grid grid-cols-5 gap-5 mt-5 px-5 pb-5 w-full">
+            <ul className="grid max-sm:grid-cols-2 grid-cols-5 gap-5 mt-5 pb-5 w-full">
                 {products.map(item => (
                     <li key={item.id} className="bg-white flex flex-col items-center p-5 shadow-lg rounded gap-3 hover:translate-y-2 hover:shadow-none duration-350 cursor-pointer active:cursor-default">
                         <Link to={`/edit/${item.id}`}>
-                          <div className="h-[230px] w-full overflow-hidden flex justify-center items-center">
+                          <div className="max-sm:h-[110px] h-[230px] w-full overflow-hidden flex justify-center items-center">
                               <img src={item.picture} alt={item.name} />
                           </div>
                           <div>

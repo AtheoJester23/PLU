@@ -1,4 +1,4 @@
-import { Circle, LogOut, Moon, Plus, Store, Sun } from "lucide-react"
+import { Circle, LogOut, Menu, Moon, Plus, Store, Sun } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../config/supabaseClient";
 import { useDispatch, useSelector } from "react-redux";
@@ -69,7 +69,7 @@ const Navbar = () => {
                 <span className="text-xl font-bold text-white">{storeName}</span>
             </Link>
 
-            <div className="flex gap-2 justify-center items-center">
+            <div className="max-sm:hidden flex gap-2 justify-center items-center">
                 <button onClick={() => console.log(id)}>testing</button>
                 
                 <button
@@ -116,6 +116,9 @@ const Navbar = () => {
                     <span>Logout</span>
                 </button>
             </div>
+            <Link to={"/Menu"} className="min-sm:hidden text-white">
+                <Menu/>
+            </Link>
         </motion.nav>
     )
 }
