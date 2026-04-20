@@ -110,6 +110,7 @@ const Create = () => {
         price,
         description,
         picture: urlData.publicUrl,
+        picture_name: imageName
       }
 
       const {data: productsData, error: productsError} = await supabase.from('products').insert(saveFile);

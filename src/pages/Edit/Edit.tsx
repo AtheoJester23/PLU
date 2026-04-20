@@ -1,8 +1,10 @@
-import { Target, Upload, X } from "lucide-react"
+import { Target, TriangleAlert, Upload, X } from "lucide-react"
 import { nanoid } from "nanoid";
 import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import supabase from "../../config/supabaseClient";
 import { useNavigate, useParams } from "react-router-dom";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { motion } from 'framer-motion'
 
 type possibleErrs = {
   name: boolean,
@@ -24,19 +26,21 @@ type productDeets = {
 
 const Edit = () => {
     const { id } = useParams();
-    const [productDetails, setProductDetails] = useState<productDeets | null>(null)
+    const [productDetails, setProductDetails] = useState<productDeets | null>(null);
 
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePrev, setImagePrev] = useState<string | null>(null);
-  const [imageName, setImageName] = useState<string | null>(null);
-  const [errors, setErrors] = useState({
-    name: false,
-    price: false,
-    bio: false,
-    pic: false
-  })
-  const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [confirmDel, setConfirmDel] = useState(false)
+
+    const [imageFile, setImageFile] = useState<File | null>(null)
+    const [imagePrev, setImagePrev] = useState<string | null>(null);
+    const [imageName, setImageName] = useState<string | null>(null);
+    const [errors, setErrors] = useState({
+        name: false,
+        price: false,
+        bio: false,
+        pic: false
+    })
+    const navigate = useNavigate();
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handlePickPic = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.currentTarget.files?.[0];
@@ -126,7 +130,7 @@ const Edit = () => {
         picture: urlData.publicUrl,
       }
 
-      const {data: productsData, error: productsError} = await supabase.from('products').insert(saveFile);
+      const {error: productsError} = await supabase.from('products').insert(saveFile);
 
       if(productsError) throw productsError;
 
@@ -145,6 +149,8 @@ const Edit = () => {
             if(error) throw error;
 
             setProductDetails(data);
+            setImagePrev(data.picture);
+            setImageName(data.picture_name);
         } catch (error) {
             console.error((error as Error).message)
         }
@@ -152,6 +158,18 @@ const Edit = () => {
 
     getProduct();
   },[]) 
+
+  const handleDelete = async () => {
+    try {
+        const {error} = await supabase.from('products').delete().eq("id", productDetails?.id);
+
+        if(error) throw error;
+
+        
+    } catch (error) {
+        console.error((error as Error).message)
+    }
+  }
 
   return (
     <main className="bg-main  p-10 pt-20">
@@ -251,11 +269,48 @@ const Edit = () => {
           </div>
         )}
 
-        <button className="cursor-pointer active:cursor-default bg-btn font-bold py-3 rounded text-[var(--textColorr)]">
-          Submit
-        </button>
-        
+        <div className="w-full flex gap-2">
+            <button onClick={() => setConfirmDel(true)} className="flex-1 cursor-pointer active:cursor-default bg-red-500 font-bold py-3 rounded text-[var(--textColorr)]">
+                Delete
+            </button>
+            <button className="flex-1 cursor-pointer active:cursor-default bg-green-500 font-bold py-3 rounded text-[var(--textColorr)]">
+                Submit
+            </button>
+        </div>
       </form>
+      <Dialog 
+        open={confirmDel} 
+        onClose={setConfirmDel} 
+        className="relative z-50"
+      >
+        <motion.div className="fixed inset-0 bg-black/60" 
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+        />
+
+        <div className='fixed inset-0 flex w-screen items-center justify-center p-4'>
+
+            <DialogPanel className="mx-auto max-w-sm rounded bg-white p-5 max-sm:w-[90%] sm:w-[50%]">
+                <div className='flex justify-center flex-col items-center gap-3'>
+                    <TriangleAlert size={100} className='text-red-500'/>
+                    <div className='text-center'>
+                        <DialogTitle className="text-2xl font-bold">Are you sure?</DialogTitle>
+                        <p className="text-gray-500">Warning: This action cannot be undone.</p>
+                    </div>
+                    <div className='flex gap-3'>
+                        <button 
+                            className='px-5 py-2 bg-red-500 text-white rounded-full cursor-pointer hover:bg-red-600 duration-200 -translate-y-0.25 hover:translate-none shadow hover:shadow-none' 
+                            onClick={() => handleDelete()}>
+                                Yes
+                        </button>
+                        <button className='px-5 py-2 bg-gray-500 text-white rounded-full cursor-pointer hover:bg-gray-600 duration-200 -translate-y-0.25 hover:translate-none shadow hover:shadow-none' onClick={() => setConfirmDel(false)}>Cancel</button>
+                    </div>
+                </div>
+            </DialogPanel>
+        </div>
+
+      </Dialog>
     </main>
   )
 }
