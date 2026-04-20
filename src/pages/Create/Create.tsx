@@ -57,7 +57,7 @@ const Create = () => {
       }
   }
 
-  const handleUpload = async (e: SubmitEvent<HTMLFormElement>) => {
+  const handleUpdate = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
@@ -126,7 +126,7 @@ const Create = () => {
 
   return (
     <main className="bg-main  p-10 pt-20">
-      <form className="simpleForms h-[100%] shadow-lg" onSubmit={(e) => handleUpload(e)}>
+      <form className="simpleForms h-[100%] shadow-lg" onSubmit={(e) => handleUpdate(e)}>
         <h1 className="text-4xl font-bold">Create Product</h1>
         <div>
           <input className="w-full" type="text" name="productName" placeholder="Product Name" autoComplete="off"/>

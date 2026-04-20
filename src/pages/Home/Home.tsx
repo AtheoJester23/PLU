@@ -21,7 +21,7 @@ const Home = () => {
     const theme = useSelector((state: RootState) => state.ui.theme);
     const userId = useSelector((state: RootState) => state.auth.user.id);
     const navigate = useNavigate();
-    const [products, setProducts] = useState<productDetails | null>(null);
+    const [products, setProducts] = useState<productDetails | []>([]);
     const [loading, setLoading] = useState<boolean>(true);
     let temporaryProducts = [
         {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 1", price: 19.99, id: 1},
@@ -59,7 +59,7 @@ const Home = () => {
     }, [userId])
 
   return (
-    <main className={`auto-rows-fr py-[90px] px-10 ${!products && "h-[100vh]"} bg-main`}>
+    <main className={`auto-rows-fr py-[90px] px-10 ${products && products?.length < 6 && "h-[100vh]"} bg-main`}>
       <h1 className="text-3xl font-bold p-0">Products</h1>
       {loading ? (
         <div className="h-[100%] flex justify-center items-center font-bold">
@@ -75,7 +75,7 @@ const Home = () => {
           ):(
             <ul className="grid grid-cols-5 gap-5 mt-5 px-5 pb-5 w-full">
                 {products.map(item => (
-                    <li key={item.id} className="bg-white flex flex-col items-center p-5 shadow rounded gap-3 hover:translate-y-0.25 duration-200 cursor-pointer active:cursor-default">
+                    <li key={item.id} className="bg-white flex flex-col items-center p-5 shadow-lg rounded gap-3 hover:translate-y-2 hover:shadow-none duration-350 cursor-pointer active:cursor-default">
                         <Link to={`/edit/${item.id}`}>
                           <div className="h-[230px] w-full overflow-hidden flex justify-center items-center">
                               <img src={item.picture} alt={item.name} />

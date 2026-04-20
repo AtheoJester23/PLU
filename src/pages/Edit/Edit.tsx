@@ -75,7 +75,7 @@ const Edit = () => {
       }
   }
 
-  const handleUpload = async (e: SubmitEvent<HTMLFormElement>) => {
+  const handleUpdate = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
@@ -101,11 +101,14 @@ const Edit = () => {
       errs.pic = true;
     }
 
-    // if(Object.values(errs).includes(true)){
-    //   setErrors(errs);
-    //   errs = {...errors};
-    //   return;
-    // }
+    if(Object.values(errs).includes(true)){
+      setErrors(errs);
+      errs = {...errors};
+      console.log("There's an error", errors);
+      return;
+    }
+
+    return;
 
     try {
       const {data, error} = await supabase.storage.from('productsPic').upload(`public/${imageName}`, imageFile)
@@ -173,7 +176,7 @@ const Edit = () => {
 
   return (
     <main className="bg-main  p-10 pt-20">
-      <form className="simpleForms h-[100%] shadow-lg" onSubmit={(e) => handleUpload(e)}>
+      <form className="simpleForms h-[100%] shadow-lg" onSubmit={(e) => handleUpdate(e)}>
         <h1 className="text-4xl font-bold">Edit Product</h1>
         <div>
             <input
