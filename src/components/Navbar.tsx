@@ -12,6 +12,7 @@ const Navbar = () => {
     const theme = useSelector((state: RootState) => state.ui.theme);
     const dispatch = useDispatch<AppDispatch>()
     const navigate = useNavigate();
+    const storeName = useSelector((state: RootState) => state.auth.user.storeName);
 
     useEffect(() => {
         console.log(theme === "light");
@@ -65,7 +66,7 @@ const Navbar = () => {
         >
             <Link to={"/"} className="flex items-center gap-2">
                 <Store className="text-white" aria-hidden="true" />
-                <span className="text-xl font-bold text-white">Testing</span>
+                <span className="text-xl font-bold text-white">{storeName}</span>
             </Link>
 
             <div className="flex gap-2 justify-center items-center">
