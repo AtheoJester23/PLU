@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 import supabase from "../../config/supabaseClient"
 import { useDispatch } from "react-redux"
 import type { AppDispatch } from "../../state/store"
-import { setUser } from "../../state/auth/authSlice"
+import { setStoreName, setUser } from "../../state/auth/authSlice"
 
 type possibleErrs = {
   email: boolean,
@@ -54,12 +54,16 @@ const FrontPage = () => {
         throw new Error(error.message);
       }
 
+      const {data: storeDeets, error: storeDeetsErr} = await supabase.from("profiles").select("*").eq("id", data.user.id);
+
+      if(storeDeetsErr) throw storeDeetsErr;
+
       console.log(data);
 
       console.log('Logged in successfully...', data.user.id)
 
       dispatch(setUser(data.user.id));
-
+      dispatch(setStoreName(storeDeets[0].store_name))
       navigate('/home')
     } catch (error) {
       console.error((error as Error).message);

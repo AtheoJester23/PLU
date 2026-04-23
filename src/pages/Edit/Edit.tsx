@@ -164,11 +164,11 @@ const Edit = () => {
 
   const handleDelete = async () => {
     try {
-        const {error} = await supabase.from('products').delete().eq("id", productDetails?.id);
+        const {data, error} = await supabase.from('products').delete().eq("id", productDetails?.id);
 
         if(error) throw error;
 
-        
+        console.log(data);
     } catch (error) {
         console.error((error as Error).message)
     }
@@ -273,7 +273,7 @@ const Edit = () => {
         )}
 
         <div className="w-full flex gap-2">
-            <button onClick={() => setConfirmDel(true)} className="flex-1 cursor-pointer active:cursor-default bg-red-500 font-bold py-3 rounded text-[var(--textColorr)]">
+            <button type="button" onClick={() => setConfirmDel(true)} className="flex-1 cursor-pointer active:cursor-default bg-red-500 font-bold py-3 rounded text-[var(--textColorr)]">
                 Delete
             </button>
             <button className="flex-1 cursor-pointer active:cursor-default bg-green-500 font-bold py-3 rounded text-[var(--textColorr)]">
@@ -303,6 +303,7 @@ const Edit = () => {
                     </div>
                     <div className='flex gap-3'>
                         <button 
+                            type="button"
                             className='px-5 py-2 bg-red-500 text-white rounded-full cursor-pointer hover:bg-red-600 duration-200 -translate-y-0.25 hover:translate-none shadow hover:shadow-none' 
                             onClick={() => handleDelete()}>
                                 Yes

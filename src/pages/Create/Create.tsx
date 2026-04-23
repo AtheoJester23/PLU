@@ -125,9 +125,9 @@ const Create = () => {
   }
 
   return (
-    <main className="bg-main  p-10 pt-20">
-      <form className="simpleForms h-[100%] shadow-lg" onSubmit={(e) => handleUpdate(e)}>
-        <h1 className="text-4xl font-bold">Create Product</h1>
+    <main className="bg-main h-screen p-10 pt-20">
+      <form className="simpleForms h-[100%] shadow-lg flex justify-center" onSubmit={(e) => handleUpdate(e)}>
+        <h1 className="text-4xl max-sm:text-2xl text-center text-nav font-bold">Create Product</h1>
         <div>
           <input className="w-full" type="text" name="productName" placeholder="Product Name" autoComplete="off"/>
         </div>
@@ -137,7 +137,7 @@ const Create = () => {
         </div>
 
         <div className="red-5005">
-          <textarea className="w-full" name="description" placeholder="Description" rows={12}/>
+          <textarea className="w-full h-50 resize-none" name="description" placeholder="Description"/>
         </div>
 
         {!imagePrev ? (

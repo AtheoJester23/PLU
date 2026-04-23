@@ -6,6 +6,7 @@ import type { AppDispatch, RootState } from "../state/store";
 import { setTheme } from "../state/UI/uiSlice";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { setStoreName, setUser } from "../state/auth/authSlice";
 
 const Navbar = () => {
     const id = useSelector((state: RootState) => state.auth.user.id)
@@ -40,6 +41,9 @@ const Navbar = () => {
             if(error){
                 throw new Error(error.message)
             } 
+
+            dispatch(setUser(null));
+            dispatch(setStoreName(null))
 
             navigate('/');
         } catch (error) {
