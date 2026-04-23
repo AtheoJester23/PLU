@@ -22,12 +22,12 @@ const MainLayout = () => {
         
         if(error) throw error;
 
-        // const {data: storeDeets, error: storeDeetsErr} = await supabase.from("profiles").select("*").eq("id", data.session?.user.id);
+        const {data: storeDeets, error: storeDeetsErr} = await supabase.from("profiles").select("*").eq("id", data.session?.user.id);
 
-        // if(storeDeetsErr) throw error;
+        if(storeDeetsErr) throw error;
 
-        // dispatch(setUser(data.session?.user.id));
-        // dispatch(setStoreName(storeDeets[0].store_name));
+        dispatch(setUser(data.session?.user.id));
+        dispatch(setStoreName(storeDeets[0].store_name));
       } catch (error) {
         console.error((error as Error).message);
       }finally{

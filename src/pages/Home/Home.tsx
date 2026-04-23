@@ -82,7 +82,7 @@ const Home = () => {
                           </div>
                           <div>
                               <h2>{item.name}</h2>
-                              <p>${item.price.toFixed(2)}</p>
+                              <p>₱{item.price.toFixed(2)}</p>
                           </div>
                         </Link>
                     </li>

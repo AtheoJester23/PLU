@@ -1,4 +1,4 @@
-import { Upload, X } from "lucide-react"
+import { ChevronDown, Upload, X } from "lucide-react"
 import { nanoid } from "nanoid";
 import { useRef, useState, type SubmitEvent } from "react";
 import supabase from "../../config/supabaseClient";
@@ -8,18 +8,20 @@ type possibleErrs = {
   name: boolean,
   price: boolean,
   bio: boolean,
-  pic: boolean
+  pic: boolean,
+  category: boolean
 }
 
 const Create = () => {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePrev, setImagePrev] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<possibleErrs>({
     name: false,
     price: false,
     bio: false,
-    pic: false
+    pic: false,
+    category: false
   })
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -63,6 +65,7 @@ const Create = () => {
     const formData = new FormData(e.currentTarget);
     const name = formData.get("productName") as string;
     const price = Number(formData.get('productPrice')) as number;
+    const category = formData.get("category") as string;
     const description = formData.get('description') as string;
     
     let errs = {...errors};
@@ -79,15 +82,23 @@ const Create = () => {
       errs.price = true;
     }
 
+    if(!category || category.replace(/[ ]/g, "") == ""){
+      errs.category = true;
+    }
+
     if(!imagePrev){
       errs.pic = true;
     }
 
-    // if(Object.values(errs).includes(true)){
-    //   setErrors(errs);
-    //   errs = {...errors};
-    //   return;
-    // }
+    if(!category){
+      errs.category = true;
+    }
+
+    if(Object.values(errs).includes(true)){
+      setErrors(errs);
+      errs = {...errors};
+      return;
+    }
 
     try {
       const {data, error} = await supabase.storage.from('productsPic').upload(`public/${imageName}`, imageFile)
@@ -129,11 +140,18 @@ const Create = () => {
       <form className="simpleForms h-[100%] shadow-lg flex justify-center" onSubmit={(e) => handleUpdate(e)}>
         <h1 className="text-4xl max-sm:text-2xl text-center text-nav font-bold">Create Product</h1>
         <div>
-          <input className="w-full" type="text" name="productName" placeholder="Product Name" autoComplete="off"/>
+          <input onChange={() => setErrors(prev => ({...prev, name: false}))} className="w-full" type="text" name="productName" placeholder="Product Name" autoComplete="off"/>
+          {errors.name && <small className="text-red-500">Product Name is required*</small>}
         </div>
 
         <div>
-          <input className="w-full" type="number" name="productPrice" placeholder="Product Price" autoComplete="off"/>
+          <input onChange={() => setErrors(prev => ({...prev, price: false}))} className="w-full" type="number" name="productPrice" placeholder="Product Price" autoComplete="off"/>
+          {errors.price && <small className="text-red-500">Product Price is required*</small>}
+        </div>
+
+        <div>
+          <input onChange={() => setErrors(prev => ({...prev, category: false}))}  type="text" name="category" placeholder="Category" className="w-full" />
+          {errors.category && <small className="text-red-500">Category is required*</small>}
         </div>
 
         <div className="red-5005">
@@ -141,22 +159,25 @@ const Create = () => {
         </div>
 
         {!imagePrev ? (
-          <div className="flex flex-col justify-center w-full items-center border border-dashed border-2 rounded border-nav">
-            <label 
-              htmlFor="pic"
-              className="bg-white w-full h-full p-5 justify-center flex flex-col items-center cursor-pointer"
-            >
-              <Upload className="text-nav"/>
-              <span className="text-nav font-bold">Choose Picture</span>
-              <input 
-                ref={fileInputRef}
-                id="pic" 
-                type="file"
-                accept="image/*" 
-                className="hidden"
-                onChange={(e) => handlePickPic(e)}
-              />
-            </label>
+          <div>
+            <div className="flex flex-col justify-center w-full items-center border border-dashed border-2 rounded border-nav">
+              <label 
+                htmlFor="pic"
+                className="bg-white w-full h-full p-5 justify-center flex flex-col items-center cursor-pointer"
+              >
+                <Upload className="text-nav"/>
+                <span className="text-nav font-bold">Choose Picture</span>
+                <input 
+                  ref={fileInputRef}
+                  id="pic" 
+                  type="file"
+                  accept="image/*" 
+                  className="hidden"
+                  onChange={(e) => handlePickPic(e)}
+                />
+              </label>
+            </div>
+            {errors.pic && <small className="text-red-500">Image is required*</small>}
           </div>
         ):(
           <div className={`flex flex-col p-2 w-full justify-center items-center border border-dashed border-2 relative cursor-default`}>

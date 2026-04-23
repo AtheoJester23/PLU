@@ -19,6 +19,7 @@ type productDeets = {
   id: string,
   name: string,
   picture: string,
+  picture_name: string,
   price: number,
   store_id: string,
   updated_at?: string
@@ -85,9 +86,6 @@ const Edit = () => {
     
     let errs = {...errors};
     
-    if(!imageFile){
-      errs.pic = true;
-    }
 
     if(!name || name.replace(/[ ]/g, "") == ""){
       errs.name = true;
@@ -98,6 +96,7 @@ const Edit = () => {
     }
 
     if(!imagePrev){
+      console.log("This", imagePrev);
       errs.pic = true;
     }
 
@@ -111,15 +110,15 @@ const Edit = () => {
     return;
 
     try {
-      const {data, error} = await supabase.storage.from('productsPic').upload(`public/${imageName}`, imageFile)
+      // const {data, error} = await supabase.storage.from('productsPic').upload(`public/${imageName}`, imageFile)
     
-      if(error) throw error;
+      // if(error) throw error;
 
-      // console.log("Image uploaded successfully: ", data.path)
+      // // console.log("Image uploaded successfully: ", data.path)
     
-      const {data: urlData} = await supabase.storage.from('productsPic').getPublicUrl(data.path);
+      // const {data: urlData} = await supabase.storage.from('productsPic').getPublicUrl(data.path);
 
-      console.log(urlData);
+      // console.log(urlData);
 
       const {data: storeSesh} = await supabase.auth.getSession();
 
@@ -168,7 +167,13 @@ const Edit = () => {
 
         if(error) throw error;
 
+        const {error: storageDataErr} = await supabase.storage.from("productsPic").remove([`public/${productDetails?.picture_name}`]);
+
+        if(storageDataErr) throw storageDataErr;
+
         console.log(data);
+
+        navigate("/");
     } catch (error) {
         console.error((error as Error).message)
     }
