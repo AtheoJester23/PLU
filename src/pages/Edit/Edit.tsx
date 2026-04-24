@@ -10,18 +10,20 @@ type possibleErrs = {
   name: boolean,
   price: boolean,
   bio: boolean,
+  category: boolean,
   pic: boolean
 }
 
 type productDeets = {
-  created_at: string,
-  description: string,
-  id: string,
-  name: string,
-  picture: string,
-  picture_name: string,
-  price: number,
-  store_id: string,
+  created_at?: string,
+  description?: string,
+  id?: string,
+  name?: string,
+  picture?: string,
+  picture_name?: string,
+  price?: number,
+  store_id?: string,
+  category?: string,
   updated_at?: string
 }
 
@@ -34,10 +36,11 @@ const Edit = () => {
     const [imageFile, setImageFile] = useState<File | null>(null)
     const [imagePrev, setImagePrev] = useState<string | null>(null);
     const [imageName, setImageName] = useState<string | null>(null);
-    const [errors, setErrors] = useState({
+    const [errors, setErrors] = useState<possibleErrs>({
         name: false,
         price: false,
         bio: false,
+        category: false,
         pic: false
     })
     const navigate = useNavigate();
@@ -82,6 +85,7 @@ const Edit = () => {
     const formData = new FormData(e.currentTarget);
     const name = formData.get("productName") as string;
     const price = Number(formData.get('productPrice')) as number;
+    const category = formData.get("category") as string;
     const description = formData.get('description') as string;
     
     let errs = {...errors};
@@ -91,8 +95,12 @@ const Edit = () => {
       errs.name = true;
     }
     
-    if(!price || price <= 0){
+    if (isNaN(price) || price < 0){
       errs.price = true;
+    }
+
+    if(!category || category.replace(/[ ]/g, "") == ""){
+      errs.category = true;
     }
 
     if(!imagePrev){
@@ -107,32 +115,40 @@ const Edit = () => {
       return;
     }
 
-    return;
-
     try {
-      // const {data, error} = await supabase.storage.from('productsPic').upload(`public/${imageName}`, imageFile)
-    
-      // if(error) throw error;
+      const saveFile: productDeets = {
+        name,
+        price,
+        description,
+      }
 
-      // // console.log("Image uploaded successfully: ", data.path)
-    
-      // const {data: urlData} = await supabase.storage.from('productsPic').getPublicUrl(data.path);
+      if(imageFile){
+        // 1. Upload first
+        const { data: uplProd, error: uplProdErr } =
+          await supabase.storage.from("productsPic")
+            .upload(`public/${imageName}`, imageFile);
 
-      // console.log(urlData);
+        if (uplProdErr) throw uplProdErr;
+
+        // 2. Get URL
+        const { data: urlData } =
+          supabase.storage.from('productsPic')
+            .getPublicUrl(uplProd.path);
+
+        // 3. Update DB
+        saveFile.picture = urlData.publicUrl;
+        saveFile.picture_name = imageName ?? "";
+
+        // 4. THEN delete old file (optional cleanup)
+        await supabase.storage.from("productsPic")
+        .remove([`public/${productDetails?.picture_name}`]);
+      }
 
       const {data: storeSesh} = await supabase.auth.getSession();
 
       console.log(storeSesh.session?.user.id);
 
-      const saveFile = {
-        store_id: storeSesh.session?.user.id,
-        name,
-        price,
-        description,
-        picture: urlData.publicUrl,
-      }
-
-      const {error: productsError} = await supabase.from('products').insert(saveFile);
+      const {error: productsError} = await supabase.from('products').update(saveFile).eq("id", id);
 
       if(productsError) throw productsError;
 
@@ -153,7 +169,9 @@ const Edit = () => {
             setProductDetails(data);
             setImagePrev(data.picture);
             setImageName(data.picture_name);
-        } catch (error) {
+
+            console.log(data);
+          } catch (error) {
             console.error((error as Error).message)
         }
     }
@@ -188,20 +206,23 @@ const Edit = () => {
                 className="w-full"
                 type="text"
                 value={productDetails?.name || ""}
-                onChange={(e) =>
-                    setProductDetails((prev) => {
-                        if (!prev) return prev; // or return a default object
+                onChange={(e) =>{
+                  setErrors((prev) => ({...prev, name: false}))  
+                  setProductDetails((prev) => {
+                      if (!prev) return prev; // or return a default object
 
-                        return {
-                        ...prev,
-                        name: e.target.value,
-                        };
-                    })
+                      return {
+                      ...prev,
+                      name: e.target.value,
+                      };
+                  })
+                }
                 }
                 name="productName"
                 placeholder="Product Name"
                 autoComplete="off"
             />
+            {errors.name && <small className="text-red-500">Product Name is required*</small>}
         </div>
 
         <div>
@@ -209,20 +230,45 @@ const Edit = () => {
             className="w-full" 
             type="number" 
             value={productDetails?.price}
+            onChange={(e) =>{
+                setErrors(prev => ({...prev, price: false}))
+                setProductDetails((prev) => {
+                  if (!prev) return prev; // or return a default object
+                  
+                  return {
+                        ...prev,
+                        price: Number(e.target.value),
+                    };
+                })
+            }
+            }
+            name="productPrice" 
+            placeholder="Product Price" 
+            autoComplete="off"
+          />
+          {errors.price && <small className="text-red-500">Product Price is required*</small>}
+        </div>
+
+        <div>
+          <input 
+            className="w-full" 
+            type="text" 
+            value={productDetails?.category}
             onChange={(e) =>
                 setProductDetails((prev) => {
                     if (!prev) return prev; // or return a default object
 
                     return {
                         ...prev,
-                        price: Number(e.target.value),
+                        category: e.target.value,
                     };
                 })
             }
-            name="productPrice" 
-            placeholder="Product Price" 
+            name="category" 
+            placeholder="Category" 
             autoComplete="off"
           />
+          {errors.category && <small className="text-red-500">Category is required*</small>}
         </div>
 
         <div className="red-5005">
@@ -246,22 +292,25 @@ const Edit = () => {
         </div>
 
         {!imagePrev ? (
-          <div className="flex flex-col justify-center w-full items-center border border-dashed border-2 rounded border-nav">
-            <label 
-              htmlFor="pic"
-              className="bg-white w-full h-full p-5 justify-center flex flex-col items-center cursor-pointer"
-            >
-              <Upload className="text-nav"/>
-              <span className="text-nav font-bold">Choose Picture</span>
-              <input 
-                ref={fileInputRef}
-                id="pic" 
-                type="file"
-                accept="image/*" 
-                className="hidden"
-                onChange={(e) => handlePickPic(e)}
-              />
-            </label>
+          <div>
+            <div className="flex flex-col justify-center w-full items-center border border-dashed border-2 rounded border-nav">
+              <label 
+                htmlFor="pic"
+                className="bg-white w-full h-full p-5 justify-center flex flex-col items-center cursor-pointer"
+              >
+                <Upload className="text-nav"/>
+                <span className="text-nav font-bold">Choose Picture</span>
+                <input 
+                  ref={fileInputRef}
+                  id="pic" 
+                  type="file"
+                  accept="image/*" 
+                  className="hidden"
+                  onChange={(e) => handlePickPic(e)}
+                />
+              </label>
+            </div>
+            <small className="text-red-500">Image is requried*</small>
           </div>
         ):(
           <div className={`flex flex-col p-2 w-full justify-center items-center border border-dashed border-2 relative cursor-default`}>
