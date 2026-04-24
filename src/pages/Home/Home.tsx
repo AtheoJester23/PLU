@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import supabase from "../../config/supabaseClient";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -20,7 +20,6 @@ type productDetails = {
 const Home = () => {
     const theme = useSelector((state: RootState) => state.ui.theme);
     const userId = useSelector((state: RootState) => state.auth.user.id);
-    const navigate = useNavigate();
     const [products, setProducts] = useState<productDetails | []>([]);
     const [loading, setLoading] = useState<boolean>(true);
     let temporaryProducts = [
@@ -42,7 +41,7 @@ const Home = () => {
       const getProducts = async () => {
         try {
           setLoading(true)
-          const {data, error} = await supabase.from('products').select().eq('store_id', userId)
+          const {data, error} = await supabase.from('products').select().eq('store_id', userId).order('price', { ascending: true });
 
           if(error) throw error;
 

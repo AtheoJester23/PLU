@@ -1,5 +1,4 @@
-import { ChevronDown, Upload, X } from "lucide-react"
-import { nanoid } from "nanoid";
+import { Upload, X } from "lucide-react"
 import { useRef, useState, type SubmitEvent } from "react";
 import supabase from "../../config/supabaseClient";
 import { useNavigate } from "react-router-dom";
@@ -124,7 +123,7 @@ const Create = () => {
         picture_name: imageName
       }
 
-      const {data: productsData, error: productsError} = await supabase.from('products').insert(saveFile);
+      const {error: productsError} = await supabase.from('products').insert(saveFile);
 
       if(productsError) throw productsError;
 

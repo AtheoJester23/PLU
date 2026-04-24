@@ -1,5 +1,4 @@
-import { Target, TriangleAlert, Upload, X } from "lucide-react"
-import { nanoid } from "nanoid";
+import { TriangleAlert, Upload, X } from "lucide-react"
 import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import supabase from "../../config/supabaseClient";
 import { useNavigate, useParams } from "react-router-dom";
@@ -86,7 +85,6 @@ const Edit = () => {
     const name = formData.get("productName") as string;
     const price = Number(formData.get('productPrice')) as number;
     const category = formData.get("category") as string;
-    const description = formData.get('description') as string;
     
     let errs = {...errors};
     
@@ -119,7 +117,7 @@ const Edit = () => {
       const saveFile: productDeets = {
         name,
         price,
-        description,
+        category,
       }
 
       if(imageFile){
@@ -254,7 +252,11 @@ const Edit = () => {
             className="w-full" 
             type="text" 
             value={productDetails?.category}
-            onChange={(e) =>
+            onChange={(e) =>{
+                setErrors(prev => ({
+                  ...prev, category: false
+                }))
+            
                 setProductDetails((prev) => {
                     if (!prev) return prev; // or return a default object
 
@@ -263,6 +265,7 @@ const Edit = () => {
                         category: e.target.value,
                     };
                 })
+            }
             }
             name="category" 
             placeholder="Category" 

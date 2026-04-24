@@ -1,4 +1,4 @@
-import { Circle, LogOut, Menu, Moon, Plus, Store, Sun } from "lucide-react"
+import { LogOut, Menu, Moon, Plus, Store, Sun } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom";
 import supabase from "../config/supabaseClient";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +9,6 @@ import { motion } from "framer-motion";
 import { setStoreName, setUser } from "../state/auth/authSlice";
 
 const Navbar = () => {
-    const id = useSelector((state: RootState) => state.auth.user.id)
     const theme = useSelector((state: RootState) => state.ui.theme);
     const dispatch = useDispatch<AppDispatch>()
     const navigate = useNavigate();
@@ -74,8 +73,6 @@ const Navbar = () => {
             </Link>
 
             <div className="max-sm:hidden flex gap-2 justify-center items-center">
-                <button onClick={() => console.log(id)}>testing</button>
-                
                 <button
                     onClick={handleTheme}
                     className={`relative w-[70px] h-[30px] bg-[#7E6363] rounded-full px-1 cursor-pointer flex items-center`}
