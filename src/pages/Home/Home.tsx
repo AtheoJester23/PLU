@@ -59,15 +59,14 @@ const Home = () => {
     }, [userId])
 
     const handleSort = () => {
-      setSort(prev => prev === "lowToHigh" ? "highToLow" : "lowToHigh");
-      console.log(sort);
-
       if(sort === "lowToHigh"){
-        const ascending = products.sort((a, b) => a.price - b.price);
-        console.log(ascending);
-      }else{
         const descending = products.sort((a, b) => b.price - a.price);
+        setSort("highToLow");
         console.log(descending);
+      }else{
+        const ascending = products.sort((a, b) => a.price - b.price);
+        setSort("lowToHigh");
+        console.log(ascending);
       }
     }
 
