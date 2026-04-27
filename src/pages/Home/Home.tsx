@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import supabase from "../../config/supabaseClient";
-import { Plus } from "lucide-react";
+import { ChevronDown, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../state/store";
@@ -18,6 +18,7 @@ type productDetails = {
 }[]
 
 const Home = () => {
+    const [sort, setSort] = useState("lowToHigh")
     const theme = useSelector((state: RootState) => state.ui.theme);
     const userId = useSelector((state: RootState) => state.auth.user.id);
     const [products, setProducts] = useState<productDetails | []>([]);
@@ -57,9 +58,35 @@ const Home = () => {
       getProducts();
     }, [userId])
 
+    const handleSort = () => {
+      setSort(prev => prev === "lowToHigh" ? "highToLow" : "lowToHigh");
+      console.log(sort);
+
+      if(sort === "lowToHigh"){
+        const ascending = products.sort((a, b) => a.price - b.price);
+        console.log(ascending);
+      }else{
+        const descending = products.sort((a, b) => b.price - a.price);
+        console.log(descending);
+      }
+    }
+
   return (
     <main className={`auto-rows-fr max-sm:py-[65px] py-[90px] px-7 ${products && products?.length < 6 && "h-[100vh]"} bg-main`}>
       <h1 className="text-3xl font-bold p-0 text-nav text-center">Products</h1>
+      
+      <div className="flex justify-end">
+        <div className="flex gap-3 justify-center items-center">
+          <small>sort by: </small>
+          <div className="relative">
+            <select onChange={() => handleSort()} defaultValue={"lowToHigh"} name="" id="" className="focus:outline-none focus:ring-0 bg-white py-2 pe-10 ps-4 rounded appearance-none">
+              <option value="lowToHigh">Price low to high</option>
+              <option value="hightoLow">Price high to low</option>
+            </select>
+            <ChevronDown className="absolute top-2 right-2"/>
+          </div>
+        </div>
+      </div>
       {loading ? (
         <div className="h-[100%] flex justify-center items-center font-bold">
           <ClipLoader className="text-red-500" color={`${theme == "light" ? "black" : "white"}`}/>

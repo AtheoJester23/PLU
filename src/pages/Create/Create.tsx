@@ -118,6 +118,7 @@ const Create = () => {
         store_id: storeSesh.session?.user.id,
         name,
         price,
+        category,
         description,
         picture: urlData.publicUrl,
         picture_name: imageName
