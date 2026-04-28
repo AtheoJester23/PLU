@@ -60,11 +60,13 @@ const Home = () => {
 
     const handleSort = () => {
       if(sort === "lowToHigh"){
-        const descending = products.sort((a, b) => b.price - a.price);
+        const descending = [...products].sort((a, b) => b.price - a.price);
+        setProducts(descending);
         setSort("highToLow");
         console.log(descending);
       }else{
-        const ascending = products.sort((a, b) => a.price - b.price);
+        const ascending = [...products].sort((a, b) => a.price - b.price);
+        setProducts(ascending);
         setSort("lowToHigh");
         console.log(ascending);
       }
@@ -73,14 +75,21 @@ const Home = () => {
     const handleFilterProducts = (category: string) => {
       setOpen(false);
       console.log(prods);
-      setProducts(prods.filter(item => item.category === category));
+
+      if(category === "All"){
+        setProducts(prods);
+        return;
+      }else{
+        setProducts(prods.filter(item => item.category === category));
+      }
     }
 
   return (
     <main className={`auto-rows-fr max-sm:py-[65px] py-[140px] px-7 ${products && products?.length < 6 && "h-[100vh]"} bg-main`}>
       <h1 className="text-3xl font-bold p-0 text-nav text-center">Products</h1>
       
-      <div className="flex justify-end fixed py-2 top-16 left-0 right-0 bg-navBtn z-100 px-5">
+      <div className="flex justify-between fixed py-2 top-16 left-0 right-0 bg-navBtn z-100 px-5">
+        <input type="text" placeholder="Search products..." />
         <div className="flex gap-3 justify-center items-center">
           <small>sort by: </small>
           <div className="relative">
@@ -143,6 +152,9 @@ const Home = () => {
                             <span>{item}</span>
                           </li>
                         ))}
+                        <li onClick={() => handleFilterProducts("All")} key="all" className="bg-navBtn text-white w-full p-5 rounded flex font-bold cursor-pointer -translate-y-0.25 hover:translate-none duration-200">
+                          <span>All</span>
+                        </li>
                       </ul>
                     ):(
                       <div className="flex flex-col justify-center items-center gap-2">
