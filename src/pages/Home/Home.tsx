@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom";
 import supabase from "../../config/supabaseClient";
-import { ChevronDown, Plus } from "lucide-react";
+import { ChevronDown, Funnel, Plus, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../state/store";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../state/store";
 import { ClipLoader } from "react-spinners";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { motion } from "framer-motion";
+import { setProductsState } from "../../state/UI/uiSlice";
 
-type productDetails = {
+export type productDetails = {
   created_at: string,
+  category: string,
   description: string,
   id: string,
   name: string,
@@ -21,22 +25,15 @@ const Home = () => {
     const [sort, setSort] = useState("lowToHigh")
     const theme = useSelector((state: RootState) => state.ui.theme);
     const userId = useSelector((state: RootState) => state.auth.user.id);
+    
     const [products, setProducts] = useState<productDetails | []>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    let temporaryProducts = [
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 1", price: 19.99, id: 1},
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 2", price: 29.99, id: 2},
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 3", price: 39.99, id: 3},
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 4", price: 49.99, id: 4},
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 5", price: 59.99, id: 5},
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 1", price: 19.99, id: 6},
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 2", price: 29.99, id: 7},
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 3", price: 39.99, id: 8},
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 4", price: 49.99, id: 9},
-        {img: "https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZHVjdHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60", name: "Product 5", price: 59.99, id: 10},
-    ]
+    
+    const prods = useSelector((state: RootState) => state.ui.products);
+    const dispatch = useDispatch<AppDispatch>();
 
-    temporaryProducts.length = 0;
+    const [loading, setLoading] = useState<boolean>(true);
+    const [open, setOpen] = useState(false);
+    const [categories, setCategories] = useState<string[]>([]);
 
     useEffect(() => {
       const getProducts = async () => {
@@ -47,6 +44,9 @@ const Home = () => {
           if(error) throw error;
 
           setProducts(data);
+          const withCategories = data.filter(item => item.category).map(item => item.category);
+          setCategories([...new Set(withCategories)]);
+          dispatch(setProductsState(data));
         } catch (error) {
           console.error((error as Error).message)
         }finally{
@@ -70,11 +70,17 @@ const Home = () => {
       }
     }
 
+    const handleFilterProducts = (category: string) => {
+      setOpen(false);
+      console.log(prods);
+      setProducts(prods.filter(item => item.category === category));
+    }
+
   return (
-    <main className={`auto-rows-fr max-sm:py-[65px] py-[90px] px-7 ${products && products?.length < 6 && "h-[100vh]"} bg-main`}>
+    <main className={`auto-rows-fr max-sm:py-[65px] py-[140px] px-7 ${products && products?.length < 6 && "h-[100vh]"} bg-main`}>
       <h1 className="text-3xl font-bold p-0 text-nav text-center">Products</h1>
       
-      <div className="flex justify-end">
+      <div className="flex justify-end fixed py-2 top-16 left-0 right-0 bg-navBtn z-100 px-5">
         <div className="flex gap-3 justify-center items-center">
           <small>sort by: </small>
           <div className="relative">
@@ -82,8 +88,11 @@ const Home = () => {
               <option value="lowToHigh">Price low to high</option>
               <option value="hightoLow">Price high to low</option>
             </select>
-            <ChevronDown className="absolute top-2 right-2"/>
+            <ChevronDown className="pointer-events-none absolute top-2 right-2"/>
           </div>
+          <button onClick={() => setOpen(true)} className="bg-nav p-2 rounded cursor-pointer hover:bg-[#7E6363]">
+            <Funnel color="white"/>
+          </button>
         </div>
       </div>
       {loading ? (
@@ -116,6 +125,36 @@ const Home = () => {
           )}
         </>
       )}
+      <Dialog open={open} onClose={() => setOpen(false)} className={`relative z-500`}>
+        <motion.div className="fixed inset-0 bg-black/60" 
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+        />
+        
+        <div className='fixed inset-0 flex w-screen items-center justify-center p-4'>
+
+            <DialogPanel className="mx-auto max-w-sm rounded bg-white p-5 max-sm:w-[90%] sm:w-[50%] h-[50%] overflow-y-auto">
+                <>
+                    {products.length > 0 ? (
+                      <ul className='flex justify-center flex-col items-center gap-3'>
+                        {categories.map((item, index) => (
+                          <li onClick={() => handleFilterProducts(item)} key={index} className="bg-navBtn text-white w-full p-5 rounded flex font-bold cursor-pointer -translate-y-0.25 hover:translate-none duration-200">
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ):(
+                      <div className="flex flex-col justify-center items-center gap-2">
+                        <TriangleAlert className="text-red-500" size={50}/>
+                        <p className="font-bold text-red-500">No products to filter</p>
+                      </div>
+                    )}
+                    
+                </>
+            </DialogPanel>
+        </div>
+      </Dialog>
     </main>
   )
 }
