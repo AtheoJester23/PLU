@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../state/store";
 import { ClipLoader } from "react-spinners";
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import { motion } from "framer-motion";
 import { setProductsState } from "../../state/UI/uiSlice";
 
@@ -89,7 +89,7 @@ const Home = () => {
       <h1 className="text-3xl font-bold p-0 text-nav text-center">Products</h1>
       
       <div className="flex justify-between fixed py-2 top-16 left-0 right-0 bg-navBtn z-100 px-5">
-        <input type="text" placeholder="Search products..." />
+        <input type="text" placeholder="Search products..." className="bg-white px-5 rounded outline-none"/>
         <div className="flex gap-3 justify-center items-center">
           <small>sort by: </small>
           <div className="relative">
