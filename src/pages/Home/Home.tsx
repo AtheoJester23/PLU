@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import supabase from "../../config/supabaseClient";
-import { ChevronDown, Funnel, Plus, TriangleAlert } from "lucide-react";
+import { ChevronDown, Funnel, Plus, Search, TriangleAlert } from "lucide-react";
 import { useEffect, useState, type SubmitEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../state/store";
@@ -33,6 +33,8 @@ const Home = () => {
 
     const [loading, setLoading] = useState<boolean>(true);
     const [open, setOpen] = useState(false);
+    const [phoneFilter, setPhoneFilter] = useState(false);
+
     const [categories, setCategories] = useState<string[]>([]);
 
     useEffect(() => {
@@ -59,6 +61,8 @@ const Home = () => {
     }, [userId])
 
     const handleSort = () => {
+      setPhoneFilter(false)
+
       if(sort === "lowToHigh"){
         const descending = [...products].sort((a, b) => b.price - a.price);
         setProducts(descending);
@@ -86,6 +90,7 @@ const Home = () => {
 
     const handleFilterProducts = (category: string) => {
       setOpen(false);
+      setPhoneFilter(false);
       console.log(prods);
 
       if(category === "All"){
@@ -97,19 +102,30 @@ const Home = () => {
     }
 
   return (
-    <main className={`auto-rows-fr max-sm:py-[65px] py-[140px] px-7 ${products && products?.length < 6 && "h-[100vh]"} bg-main`}>
+    <main className={`auto-rows-fr max-sm:py-[120px] py-[140px] px-7 ${products && products?.length < 6 && "h-[100vh]"} bg-main`}>
       <h1 className="text-3xl font-bold p-0 text-nav text-center">Products</h1>
       
-      <div className="flex justify-between fixed py-2 top-16 left-0 right-0 bg-navBtn z-100 px-5">
-        <form onSubmit={(e) => linearSearch(e)}>
+      <div className="flex gap-5 justify-between fixed py-2 max-sm:top-12 top-16 left-0 right-0 bg-navBtn z-100 px-5">
+        <form onSubmit={(e) => linearSearch(e)} className="flex w-full justify-center items-center">
+          <input onChange={(e) => {
+            if(e.currentTarget.value == ""){
+              setProducts(prods);
+            }
+          }} type="text" name="searchProds" placeholder="Search products..." className="flex-1 h-full bg-white px-5 rounded outline-none rounded-s-full flex justify-center"/>
+          <button className="cursor-pointer bg-nav py-2 px-3 h-full rounded-e-full">
+            <Search aria-hidden="true" color="white"/>
+          </button>
+        </form>
+        
+        {/* <form onSubmit={(e) => linearSearch(e)} className="hidden">
           <input onChange={(e) => {
             if(e.currentTarget.value == ""){
               setProducts(prods);
             }
           }} type="text" name="searchProds" placeholder="Search products..." className="h-full bg-white px-5 rounded outline-none"/>
-        </form>
-        <div className="flex gap-3 justify-center items-center">
-          <small>sort by: </small>
+        </form> */}
+        <div className="max-sm:hidden flex gap-3 justify-center items-center">
+          <small className="whitespace-nowrap">sort by: </small>
           <div className="relative">
             <select onChange={() => handleSort()} defaultValue={"lowToHigh"} name="" id="" className="focus:outline-none focus:ring-0 bg-white py-2 pe-10 ps-4 rounded appearance-none">
               <option value="lowToHigh">Price low to high</option>
@@ -121,6 +137,9 @@ const Home = () => {
             <Funnel color="white"/>
           </button>
         </div>
+        <button onClick={() => setPhoneFilter(true)}>
+          <Funnel aria-hidden="true" color="white"/>
+        </button>
       </div>
       {loading ? (
         <div className="h-[100%] flex justify-center items-center font-bold">
@@ -172,6 +191,49 @@ const Home = () => {
 
             <DialogPanel className="mx-auto max-w-sm rounded bg-white p-5 max-sm:w-[90%] sm:w-[50%] h-[50%] overflow-y-auto">
                 <>
+                    {products.length > 0 ? (
+                      <ul className='flex justify-center flex-col items-center gap-3'>
+                        {categories.map((item, index) => (
+                          <li onClick={() => handleFilterProducts(item)} key={index} className="bg-navBtn text-white w-full p-5 rounded flex font-bold cursor-pointer -translate-y-0.25 hover:translate-none duration-200">
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                        <li onClick={() => handleFilterProducts("All")} key="all" className="bg-navBtn text-white w-full p-5 rounded flex font-bold cursor-pointer -translate-y-0.25 hover:translate-none duration-200">
+                          <span>All</span>
+                        </li>
+                      </ul>
+                    ):(
+                      <div className="flex flex-col justify-center items-center gap-2">
+                        <TriangleAlert className="text-red-500" size={50}/>
+                        <p className="font-bold text-red-500">No products to filter</p>
+                      </div>
+                    )}
+                    
+                </>
+            </DialogPanel>
+        </div>
+      </Dialog>
+
+      <Dialog open={phoneFilter} onClose={() => setPhoneFilter(false)} className={`relative z-500`}>
+        <motion.div className="fixed inset-0 bg-black/60" 
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+        />
+        
+        <div className='fixed inset-0 flex w-screen items-center justify-center p-4'>
+
+            <DialogPanel className="mx-auto max-w-sm rounded bg-white p-5 max-sm:w-[90%] sm:w-[50%] h-[50%] overflow-y-auto flex flex-col gap-5">
+                <>
+                    <div>
+                      <div className="relative">
+                        <select onChange={() => handleSort()} defaultValue={"lowToHigh"} name="" id="" className="focus:outline-none focus:ring-0 bg-white py-2 pe-10 ps-4 rounded appearance-none border w-full border-nav">
+                          <option value="lowToHigh">Price low to high</option>
+                          <option value="hightoLow">Price high to low</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute top-2 right-2"/>
+                      </div>
+                    </div>
                     {products.length > 0 ? (
                       <ul className='flex justify-center flex-col items-center gap-3'>
                         {categories.map((item, index) => (
