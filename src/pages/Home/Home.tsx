@@ -137,7 +137,7 @@ const Home = () => {
             <Funnel color="white"/>
           </button>
         </div>
-        <button onClick={() => setPhoneFilter(true)}>
+        <button onClick={() => setPhoneFilter(true)} className="md:hidden">
           <Funnel aria-hidden="true" color="white"/>
         </button>
       </div>
