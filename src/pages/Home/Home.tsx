@@ -160,7 +160,7 @@ const Home = () => {
                   <p className="font-bold text-4xl text-nav">That product does not exist yet...</p>
               </Link>
               ):(
-                <ul className="grid max-sm:grid-cols-2 grid-cols-5 gap-5 mt-5 pb-5 w-full">
+                <ul className="grid max-sm:grid-cols-2 grid-cols-3 lg:grid-cols-5 2xl:grid-cols-7 gap-5 mt-5 pb-5 w-full">
                     {products.map(item => (
                         <li key={item.id} className="bg-white flex flex-col items-center p-5 shadow-lg rounded gap-3 hover:translate-y-2 hover:shadow-none duration-350 cursor-pointer active:cursor-default">
                             <Link to={`/edit/${item.id}`}>
