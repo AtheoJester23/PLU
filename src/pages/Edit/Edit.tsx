@@ -4,6 +4,7 @@ import supabase from "../../config/supabaseClient";
 import { useNavigate, useParams } from "react-router-dom";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { motion } from 'framer-motion'
+import { ClipLoader } from "react-spinners";
 
 type possibleErrs = {
   name: boolean,
@@ -28,6 +29,7 @@ type productDeets = {
 
 const Edit = () => {
     const { id } = useParams();
+    const [loading, setLoading] = useState<boolean>(true);
     const [productDetails, setProductDetails] = useState<productDeets | null>(null);
 
     const [confirmDel, setConfirmDel] = useState(false)
@@ -42,6 +44,8 @@ const Edit = () => {
         category: false,
         pic: false
     })
+
+
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -160,17 +164,19 @@ const Edit = () => {
   useEffect(() => {
     const getProduct = async () => {
         try {
-            const {data, error} = await supabase.from('products').select('*').eq("id", id).single();
+          const {data, error} = await supabase.from('products').select('*').eq("id", id).single();
 
-            if(error) throw error;
+          if(error) throw error;
 
-            setProductDetails(data);
-            setImagePrev(data.picture);
-            setImageName(data.picture_name);
+          setProductDetails(data);
+          setImagePrev(data.picture);
+          setImageName(data.picture_name);
 
-            console.log(data);
-          } catch (error) {
-            console.error((error as Error).message)
+          console.log(data);
+        } catch (error) {
+          console.error((error as Error).message)
+        }finally{
+          setLoading(false);
         }
     }
 
@@ -196,148 +202,154 @@ const Edit = () => {
   }
 
   return (
-    <main className="bg-main  p-10 pt-20">
-      <form className="simpleForms h-[100%] shadow-lg" onSubmit={(e) => handleUpdate(e)}>
-        <h1 className="text-4xl font-bold">Edit Product</h1>
-        <div>
-            <input
-                className="w-full"
-                type="text"
-                value={productDetails?.name || ""}
-                onChange={(e) =>{
-                  setErrors((prev) => ({...prev, name: false}))  
+    <main className="bg-main p-10 pt-20">
+      {loading ? (
+        <div className="flex h-[100vh] justify-center items-center">
+          <ClipLoader/>
+        </div>
+      ):(
+        <form className="simpleForms h-[100%] shadow-lg" onSubmit={(e) => handleUpdate(e)}>
+          <h1 className="text-4xl font-bold">Edit Product</h1>
+          <div>
+              <input
+                  className="w-full"
+                  type="text"
+                  value={productDetails?.name || ""}
+                  onChange={(e) =>{
+                    setErrors((prev) => ({...prev, name: false}))  
+                    setProductDetails((prev) => {
+                        if (!prev) return prev; // or return a default object
+
+                        return {
+                        ...prev,
+                        name: e.target.value,
+                        };
+                    })
+                  }
+                  }
+                  name="productName"
+                  placeholder="Product Name"
+                  autoComplete="off"
+              />
+              {errors.name && <small className="text-red-500">Product Name is required*</small>}
+          </div>
+
+          <div>
+            <input 
+              className="w-full" 
+              type="number" 
+              value={productDetails?.price}
+              onChange={(e) =>{
+                  setErrors(prev => ({...prev, price: false}))
+                  setProductDetails((prev) => {
+                    if (!prev) return prev; // or return a default object
+                    
+                    return {
+                          ...prev,
+                          price: Number(e.target.value),
+                      };
+                  })
+              }
+              }
+              name="productPrice" 
+              placeholder="Product Price" 
+              autoComplete="off"
+            />
+            {errors.price && <small className="text-red-500">Product Price is required*</small>}
+          </div>
+
+          <div>
+            <input 
+              className="w-full" 
+              type="text" 
+              value={productDetails?.category}
+              onChange={(e) =>{
+                  setErrors(prev => ({
+                    ...prev, category: false
+                  }))
+              
                   setProductDetails((prev) => {
                       if (!prev) return prev; // or return a default object
 
                       return {
-                      ...prev,
-                      name: e.target.value,
+                          ...prev,
+                          category: e.target.value,
                       };
                   })
-                }
-                }
-                name="productName"
-                placeholder="Product Name"
-                autoComplete="off"
+              }
+              }
+              name="category" 
+              placeholder="Category" 
+              autoComplete="off"
             />
-            {errors.name && <small className="text-red-500">Product Name is required*</small>}
-        </div>
-
-        <div>
-          <input 
-            className="w-full" 
-            type="number" 
-            value={productDetails?.price}
-            onChange={(e) =>{
-                setErrors(prev => ({...prev, price: false}))
-                setProductDetails((prev) => {
-                  if (!prev) return prev; // or return a default object
-                  
-                  return {
-                        ...prev,
-                        price: Number(e.target.value),
-                    };
-                })
-            }
-            }
-            name="productPrice" 
-            placeholder="Product Price" 
-            autoComplete="off"
-          />
-          {errors.price && <small className="text-red-500">Product Price is required*</small>}
-        </div>
-
-        <div>
-          <input 
-            className="w-full" 
-            type="text" 
-            value={productDetails?.category}
-            onChange={(e) =>{
-                setErrors(prev => ({
-                  ...prev, category: false
-                }))
-            
-                setProductDetails((prev) => {
-                    if (!prev) return prev; // or return a default object
-
-                    return {
-                        ...prev,
-                        category: e.target.value,
-                    };
-                })
-            }
-            }
-            name="category" 
-            placeholder="Category" 
-            autoComplete="off"
-          />
-          {errors.category && <small className="text-red-500">Category is required*</small>}
-        </div>
-
-        <div className="red-5005">
-          <textarea 
-            className="w-full" 
-            name="description"
-            value={productDetails?.description}
-            onChange={(e) => {
-                setProductDetails((prev) => {
-                    if(!prev) return prev;
-
-                    return {
-                        ...prev,
-                        description: e.target.value
-                    }
-                })
-            }} 
-            placeholder="Description" 
-            rows={12}
-          />
-        </div>
-
-        {!imagePrev ? (
-          <div>
-            <div className="flex flex-col justify-center w-full items-center border border-dashed border-2 rounded border-nav">
-              <label 
-                htmlFor="pic"
-                className="bg-white w-full h-full p-5 justify-center flex flex-col items-center cursor-pointer"
-              >
-                <Upload className="text-nav"/>
-                <span className="text-nav font-bold">Choose Picture</span>
-                <input 
-                  ref={fileInputRef}
-                  id="pic" 
-                  type="file"
-                  accept="image/*" 
-                  className="hidden"
-                  onChange={(e) => handlePickPic(e)}
-                />
-              </label>
-            </div>
-            <small className="text-red-500">Image is requried*</small>
+            {errors.category && <small className="text-red-500">Category is required*</small>}
           </div>
-        ):(
-          <div className={`flex flex-col p-2 w-full justify-center items-center border border-dashed border-2 relative cursor-default`}>
-            <div className='max-sm:h-[150px] max-sm:w-[300px] h-[200px] w-[400px] flex gap-2'> 
-                <img src={imagePrev} alt="Preview" className='w-full h-full object-contain'/>
-            </div>
-            <div className='flex w-full items-center justify-center'>
-                <p className='p-2 truncate'>{imageName}</p>
-            </div>
-            <button onClick={() => handleRemovePic()} className='absolute top-2 right-2 hover:translate-y-0.25 cursor-pointer duration-200'>
-                <X/>
-            </button>
-          </div>
-        )}
 
-        <div className="w-full flex gap-2">
-            <button type="button" onClick={() => setConfirmDel(true)} className="flex-1 cursor-pointer active:cursor-default bg-red-500 font-bold py-3 rounded text-[var(--textColorr)]">
-                Delete
-            </button>
-            <button className="flex-1 cursor-pointer active:cursor-default bg-green-500 font-bold py-3 rounded text-[var(--textColorr)]">
-                Submit
-            </button>
-        </div>
-      </form>
+          <div className="red-5005">
+            <textarea 
+              className="w-full" 
+              name="description"
+              value={productDetails?.description}
+              onChange={(e) => {
+                  setProductDetails((prev) => {
+                      if(!prev) return prev;
+
+                      return {
+                          ...prev,
+                          description: e.target.value
+                      }
+                  })
+              }} 
+              placeholder="Description" 
+              rows={12}
+            />
+          </div>
+
+          {!imagePrev ? (
+            <div>
+              <div className="flex flex-col justify-center w-full items-center border border-dashed border-2 rounded border-nav">
+                <label 
+                  htmlFor="pic"
+                  className="bg-white w-full h-full p-5 justify-center flex flex-col items-center cursor-pointer"
+                >
+                  <Upload className="text-nav"/>
+                  <span className="text-nav font-bold">Choose Picture</span>
+                  <input 
+                    ref={fileInputRef}
+                    id="pic" 
+                    type="file"
+                    accept="image/*" 
+                    className="hidden"
+                    onChange={(e) => handlePickPic(e)}
+                  />
+                </label>
+              </div>
+              <small className="text-red-500">Image is requried*</small>
+            </div>
+          ):(
+            <div className={`flex flex-col p-2 w-full justify-center items-center border border-dashed border-2 relative cursor-default`}>
+              <div className='max-sm:h-[150px] max-sm:w-[300px] h-[200px] w-[400px] flex gap-2'> 
+                  <img src={imagePrev} alt="Preview" className='w-full h-full object-contain'/>
+              </div>
+              <div className='flex w-full items-center justify-center'>
+                  <p className='p-2 truncate'>{imageName}</p>
+              </div>
+              <button onClick={() => handleRemovePic()} className='absolute top-2 right-2 hover:translate-y-0.25 cursor-pointer duration-200'>
+                  <X/>
+              </button>
+            </div>
+          )}
+
+          <div className="w-full flex gap-2">
+              <button type="button" onClick={() => setConfirmDel(true)} className="flex-1 cursor-pointer active:cursor-default bg-red-500 font-bold py-3 rounded text-[var(--textColorr)]">
+                  Delete
+              </button>
+              <button className="flex-1 cursor-pointer active:cursor-default bg-green-500 font-bold py-3 rounded text-[var(--textColorr)]">
+                  Submit
+              </button>
+          </div>
+        </form>
+      )}
       <Dialog 
         open={confirmDel} 
         onClose={setConfirmDel} 

@@ -2,9 +2,10 @@ import { Eye, EyeClosed } from "lucide-react"
 import { useEffect, useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import supabase from "../../config/supabaseClient"
-import { useDispatch } from "react-redux"
-import type { AppDispatch } from "../../state/store"
+import { useDispatch, useSelector } from "react-redux"
+import type { AppDispatch, RootState } from "../../state/store"
 import { setStoreName, setUser } from "../../state/auth/authSlice"
+import { ClipLoader } from "react-spinners"
 
 type possibleErrs = {
   email: boolean,
@@ -13,13 +14,14 @@ type possibleErrs = {
 
 const FrontPage = () => {
   const [hidden, setHidden] = useState(true)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [errors, setErrors] = useState<possibleErrs>({
     email: false,
     password: false
   })
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>()
+  const theme = useSelector((state: RootState) => state.ui.theme)
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -88,11 +90,21 @@ const FrontPage = () => {
         }
       } catch (error) {
         console.error((error as Error).message);
+      } finally{
+        setLoading(false);
       }
     };
 
     checkSesh();
   }, [])
+
+  if(loading){
+    return (
+      <div className="h-[100%] flex justify-center items-center font-bold">
+        <ClipLoader className="text-red-500" color={`${theme == "light" ? "black" : "white"}`}/>
+      </div>
+    )
+  }
 
   return (
     <main className="bg-main h-[100dvh] border flex justify-center items-center">
