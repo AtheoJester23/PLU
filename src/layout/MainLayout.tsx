@@ -51,7 +51,7 @@ const MainLayout = () => {
   return (
     <>
       {loading ? (
-        <main className="h-screen w-full bg-green-500 flex justify-center items-center">
+        <main className="h-screen w-full bg-main flex justify-center items-center">
           <ClipLoader/>
         </main>
       ):(

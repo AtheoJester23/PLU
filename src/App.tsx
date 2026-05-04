@@ -8,6 +8,7 @@ import MainLayout from './layout/MainLayout'
 import Create from './pages/Create/Create'
 import Edit from './pages/Edit/Edit'
 import Menu from './pages/Menu/Menu'
+import Profile from './pages/Profile/Profile'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path='/create' element={<Create/>}/>
           <Route path='/edit/:id' element={<Edit/>}/>
           <Route path='/menu' element={<Menu/>}/>
+          <Route path='/profile' element={<Profile/>}/>
         </Route>
         <Route path='*' element={<PageNotFound/>}/>
       </Routes>

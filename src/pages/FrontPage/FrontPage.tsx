@@ -100,7 +100,7 @@ const FrontPage = () => {
 
   if(loading){
     return (
-      <div className="h-[100%] flex justify-center items-center font-bold">
+      <div className="h-[100%] flex justify-center items-center font-bold bg-main">
         <ClipLoader className="text-red-500" color={`${theme == "light" ? "black" : "white"}`}/>
       </div>
     )

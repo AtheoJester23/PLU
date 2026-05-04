@@ -1,0 +1,18 @@
+.mainCont{
+    background-color: green;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.formCont{
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.formCont h1{
+    font-size: 37px;
+    font-weight: bold;
+}
