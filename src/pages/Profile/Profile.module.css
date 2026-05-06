@@ -1,5 +1,5 @@
 .mainCont{
-    background-color: green;
+    background-color: var(--main-bg);
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -10,6 +10,9 @@
     background-color: white;
     padding: 20px;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px
 }
 
 .formCont h1{

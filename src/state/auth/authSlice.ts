@@ -1,9 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
+type initialType = {
+    user: {
+        id: string | null,
+        storeName: string | null,
+        theme: 'light' | 'dark'
+    }
+}
+
+const initialState: initialType = {
     user: {
         id: null,
-        storeName: null
+        storeName: null,
+        theme: 'light'
     } 
 }
 
